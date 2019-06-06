@@ -16,15 +16,13 @@ import javax.swing.*
  * of type Checkers as its content pane.
  *
  * There is also a nested class, Checker.Applet, that can be used
- * as an applet version of the program.  The applet size should be
- * 350-by-250 (or very close to that).
- *
+ * as an applet version of the program.
  */
 class Checkers : JPanel() {
 
     private var newGameButton: JButton? = null  // Button for starting a new game.
-    private var resignButton: JButton? = null   // Button that a player can use to end
-    // the game by resigning.
+    private var restartButton: JButton? = null   // Button that a player can use to end
+    // the game by restarting.
 
     private var message: JLabel? = null  // Label for displaying messages to the user.
 
@@ -37,9 +35,9 @@ class Checkers : JPanel() {
     init {
 
         layout = null  // I will do the layout myself.
-        preferredSize = Dimension(350, 250)
+        preferredSize = Dimension(390, 290)
 
-        background = Color(255, 255, 255)  // Dark green background.
+        background = Color(255, 255, 255)  // White background.
 
         /* Create the components and add them to the applet. */
 
@@ -48,16 +46,16 @@ class Checkers : JPanel() {
         //   and label.
         add(board)
         add(newGameButton)
-        add(resignButton)
+        add(restartButton)
         add(message)
 
         /* Set the position and size of each component by calling
        its setBounds() method. */
 
         board.setBounds(20, 20, 164, 164) // Note:  size MUST be 164-by-164 !
-        newGameButton!!.setBounds(210, 60, 120, 30)
-        resignButton!!.setBounds(210, 120, 120, 30)
-        message!!.setBounds(0, 200, 350, 30)
+        newGameButton!!.setBounds(260, 60, 120, 30)
+        restartButton!!.setBounds(260, 120, 120, 30)
+        message!!.setBounds(30, 250, 350, 30)
 
     } // end constructor
 
@@ -123,8 +121,8 @@ class Checkers : JPanel() {
         init {
             background = Color.BLACK
             addMouseListener(this)
-            resignButton = JButton("Resign")
-            resignButton!!.addActionListener(this)
+            restartButton = JButton("Restart")
+            restartButton!!.addActionListener(this)
             newGameButton = JButton("New Game")
             newGameButton!!.addActionListener(this)
             message = JLabel("", JLabel.CENTER)
@@ -142,8 +140,8 @@ class Checkers : JPanel() {
             val src = evt.source
             if (src === newGameButton)
                 doNewGame()
-            else if (src === resignButton)
-                doResign()
+            else if (src === restartButton)
+                doRestart()
         }
 
 
@@ -152,7 +150,7 @@ class Checkers : JPanel() {
          */
         internal fun doNewGame() {
             if (gameInProgress) {
-                // This should not be possible, but it doens't hurt to check.
+                // This should not be possible, but it doesn't hurt to check.
                 message!!.text = "Finish the current game first!"
                 return
             }
@@ -163,23 +161,23 @@ class Checkers : JPanel() {
             message!!.text = "White:  Make your move."
             gameInProgress = true
             newGameButton!!.isEnabled = false
-            resignButton!!.isEnabled = true
+            restartButton!!.isEnabled = true
             repaint()
         }
 
 
         /**
-         * Current player resigns.  Game ends.  Opponent wins.
+         * Current player give up.  Game ends.  Opponent wins.
          */
-        internal fun doResign() {
+        internal fun doRestart() {
             if (!gameInProgress) {  // Should be impossible.
                 message!!.text = "There is no game in progress!"
                 return
             }
             if (currentPlayer == CheckersData.WHITE)
-                gameOver("WHITE resigns. BLACK wins.")
+                gameOver("WHITE give up. BLACK wins.")
             else
-                gameOver("BLACK resigns. WHITE wins.")
+                gameOver("BLACK give up. WHITE wins.")
         }
 
 
@@ -192,7 +190,7 @@ class Checkers : JPanel() {
         internal fun gameOver(str: String) {
             message!!.text = str
             newGameButton!!.isEnabled = true
-            resignButton!!.isEnabled = false
+            restartButton!!.isEnabled = false
             gameInProgress = false
         }
 
@@ -330,8 +328,8 @@ class Checkers : JPanel() {
 
 
         /**
-         * Draw  checkerboard pattern in gray and lightGray.  Draw the
-         * checkers.  If a game is in progress, hilite the legal moves.
+         * Draw  checkerboard pattern in black and blue.  Draw the
+         * checkers. If a game is in progress, highlight the legal moves.
          */
         public override fun paintComponent(g: Graphics) {
 
@@ -346,9 +344,9 @@ class Checkers : JPanel() {
             for (row in 0..7) {
                 for (col in 0..7) {
                     if (row % 2 == col % 2)
-                        g.color = Color.GRAY
+                        g.color = Color(177,137,0)
                     else
-                        g.color = Color.getHSBColor(11F, 11F, 0F)
+                        g.color = Color(70, 30, 0)
                     g.fillRect(2 + col * 20, 2 + row * 20, 20, 20)
                     when (board.pieceAt(row, col)) {
                         CheckersData.WHITE -> {
@@ -362,37 +360,37 @@ class Checkers : JPanel() {
                         CheckersData.WHITE_QUEEN -> {
                             g.color = Color.WHITE
                             g.fillOval(4 + col * 20, 4 + row * 20, 15, 15)
-                            g.color = Color.WHITE
-                            g.drawString("K", 7 + col * 20, 16 + row * 20)
+                            g.color = Color.BLACK
+                            g.drawString("Q", 7 + col * 20, 16 + row * 20)
                         }
                         CheckersData.BLACK_QUEEN -> {
                             g.color = Color.BLACK
                             g.fillOval(4 + col * 20, 4 + row * 20, 15, 15)
                             g.color = Color.WHITE
-                            g.drawString("K", 7 + col * 20, 16 + row * 20)
+                            g.drawString("Q", 7 + col * 20, 16 + row * 20)
                         }
                     }
                 }
             }
 
-            /* If a game is in progress, hilite the legal moves.   Note that legalMoves
+            /* If a game is in progress, highlight the legal moves.   Note that legalMoves
           is never null while a game is in progress. */
 
             if (gameInProgress) {
-                /* First, draw a 2-pixel cyan border around the pieces that can be moved. */
-                g.color = Color.BLACK
+                /* First, draw a 2-pixel blue border around the pieces that can be moved. */
+                g.color = Color.blue
                 for (i in legalMoves!!.indices) {
                     g.drawRect(2 + legalMoves!![i]!!.fromCol * 20, 2 + legalMoves!![i]!!.fromRow * 20, 19, 19)
                     g.drawRect(3 + legalMoves!![i]!!.fromCol * 20, 3 + legalMoves!![i]!!.fromRow * 20, 17, 17)
                 }
                 /* If a piece is selected for moving (i.e. if selectedRow >= 0), then
-                draw a 2-pixel white border around that piece and draw green borders
+                draw a 2-pixel blue border around that piece and draw cyan borders
                 around each square that that piece can be moved to. */
                 if (selectedRow >= 0) {
-                    g.color = Color.white
+                    g.color = Color.blue
                     g.drawRect(2 + selectedCol * 20, 2 + selectedRow * 20, 19, 19)
                     g.drawRect(3 + selectedCol * 20, 3 + selectedRow * 20, 17, 17)
-                    g.color = Color.black
+                    g.color = Color.cyan
                     for (i in legalMoves!!.indices) {
                         if (legalMoves!![i]!!.fromCol == selectedCol && legalMoves!![i]!!.fromRow == selectedRow) {
                             g.drawRect(2 + legalMoves!![i]!!.toCol * 20, 2 + legalMoves!![i]!!.toRow * 20, 19, 19)
@@ -401,8 +399,7 @@ class Checkers : JPanel() {
                     }
                 }
             }
-
-        }  // end paintComponent()
+        }  /* end paintComponent() */
 
 
         /**
@@ -447,7 +444,6 @@ class Checkers : JPanel() {
 
         internal var board: Array<IntArray> =
             Array(8) { IntArray(8) }  // board[r][c] is the contents of row r, column c.
-
 
         init {
             setUpGame()
@@ -500,7 +496,7 @@ class Checkers : JPanel() {
          * assumed that this move is legal.  If the move is a jump, the
          * jumped piece is removed from the board.  If a piece moves
          * the last row on the opponent's side of the board, the
-         * piece becomes a king.
+         * piece becomes a queen.
          */
         internal fun makeMove(fromRow: Int, fromCol: Int, toRow: Int, toCol: Int) {
             board[toRow][toCol] = board[fromRow][fromCol]
@@ -531,10 +527,10 @@ class Checkers : JPanel() {
             if (player != WHITE && player != BLACK)
                 return null
 
-            val playerKing: Int = if (player == WHITE)
+            val playerQueen: Int = if (player == WHITE)
                 WHITE_QUEEN
             else
-                BLACK_QUEEN  // The constant representing a King belonging to player.
+                BLACK_QUEEN  // The constant representing a Queen belonging to player.
 
             val moves = ArrayList<CheckersMove>()  // Moves will be stored in this list.
 
@@ -546,7 +542,7 @@ class Checkers : JPanel() {
 
             for (row in 0..7) {
                 for (col in 0..7) {
-                    if (board[row][col] == player || board[row][col] == playerKing) {
+                    if (board[row][col] == player || board[row][col] == playerQueen) {
                         if (canJump(player, row, col, row + 1, col + 1, row + 2, col + 2))
                             moves.add(CheckersMove(row, col, row + 2, col + 2))
                         if (canJump(player, row, col, row - 1, col + 1, row - 2, col + 2))
@@ -570,7 +566,7 @@ class Checkers : JPanel() {
             if (moves.size == 0) {
                 for (row in 0..7) {
                     for (col in 0..7) {
-                        if (board[row][col] == player || board[row][col] == playerKing) {
+                        if (board[row][col] == player || board[row][col] == playerQueen) {
                             if (canMove(player, row, col, row + 1, col + 1))
                                 moves.add(CheckersMove(row, col, row + 1, col + 1))
                             if (canMove(player, row, col, row - 1, col + 1))
@@ -608,12 +604,12 @@ class Checkers : JPanel() {
         internal fun getLegalJumpsFrom(player: Int, row: Int, col: Int): Array<CheckersMove?>? {
             if (player != WHITE && player != BLACK)
                 return null
-            val playerKing: Int = if (player == WHITE)
+            val playerQueen: Int = if (player == WHITE)
                 WHITE_QUEEN
             else
-                BLACK_QUEEN  // The constant representing a King belonging to player.
+                BLACK_QUEEN  // The constant representing a Queen belonging to player.
             val moves = ArrayList<CheckersMove>()  // The legal jumps will be stored in this list.
-            if (board[row][col] == player || board[row][col] == playerKing) {
+            if (board[row][col] == player || board[row][col] == playerQueen) {
                 if (canJump(player, row, col, row + 1, col + 1, row + 2, col + 2))
                     moves.add(CheckersMove(row, col, row + 2, col + 2))
                 if (canJump(player, row, col, row - 1, col + 1, row - 2, col + 2))
@@ -706,10 +702,10 @@ class Checkers : JPanel() {
             val content = Checkers()
             window.contentPane = content
             window.pack()
-            val screensize = Toolkit.getDefaultToolkit().screenSize
+            val screenSize = Toolkit.getDefaultToolkit().screenSize
             window.setLocation(
-                (screensize.width - window.width) / 2,
-                (screensize.height - window.height) / 2
+                (screenSize.width - window.width) / 2,
+                (screenSize.height - window.height) / 2
             )
             window.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
             window.isResizable = false
