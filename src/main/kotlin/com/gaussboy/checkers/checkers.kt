@@ -475,9 +475,9 @@ class Checkers : JPanel() {
                 }
             }
 
-            /* If no legal moves have been found, return null.  Otherwise, create
-          an array just big enough to hold all the legal moves, copy the
-          legal moves from the ArrayList into the array, and return the array. */
+            // If no legal moves have been found, return null.  Otherwise, create
+            // an array just big enough to hold all the legal moves, copy the
+            // legal moves from the ArrayList into the array, and return the array.
 
             return if (moves.size == 0)
                 null
