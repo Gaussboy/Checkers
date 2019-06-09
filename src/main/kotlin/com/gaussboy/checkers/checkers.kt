@@ -1,23 +1,8 @@
-
 import java.awt.*
 import java.awt.event.*
 import java.util.ArrayList
 import javax.swing.*
 
-
-/**
- * This panel lets two users play checkers against each other.
- * White always starts the game.  If a player can jump an opponent's
- * piece, then the player must jump.  When a player can make no more
- * moves, the game ends.
- *
- * The class has a main() routine that lets it be run as a stand-alone
- * application.  The application just opens a window that uses an object
- * of type Checkers as its content pane.
- *
- * There is also a nested class, Checker.Applet, that can be used
- * as an applet version of the program.
- */
 class Checkers : JPanel() {
 
     private var newGameButton: JButton? = null  // Button for starting a new game.
@@ -26,14 +11,8 @@ class Checkers : JPanel() {
 
     private var message: JLabel? = null  // Label for displaying messages to the user.
 
-    /**
-     * The constructor creates the Board (which in turn creates and manages
-     * the buttons and message label), adds all the components, and sets
-     * the bounds of the components.  A null layout is used.  (This is
-     * the only thing that is done in the main Checkers class.)
-     */
-    init {
 
+    init {
         layout = null  // I will do the layout myself.
         preferredSize = Dimension(390, 290)
 
@@ -60,13 +39,6 @@ class Checkers : JPanel() {
     } // end constructor
 
 
-    // --------------------  Nested Classes -------------------------------
-    /**
-     * A CheckersMove object represents a move in the game of Checkers.
-     * It holds the row and column of the piece that is to be moved
-     * and the row and column of the square to which it is to be moved.
-     * (This class makes no guarantee that the move is legal.)
-     */
     private class CheckersMove internal constructor(
         internal var fromRow: Int, internal var fromCol: Int  // Position of piece to be moved.
         , internal var toRow: Int, internal var toCol: Int      // Square it is to move to.
@@ -80,43 +52,23 @@ class Checkers : JPanel() {
     }  // end class CheckersMove.
 
 
-    /**
-     * This panel displays a 160-by-160 checkerboard pattern with
-     * a 2-pixel black border.  It is assumed that the size of the
-     * panel is set to exactly 164-by-164 pixels.  This class does
-     * the work of letting the users play checkers, and it displays
-     * the checkerboard.
-     */
     private inner class Board
-    //   current player.
 
-
-    /**
-     * Constructor.  Create the buttons and label.  Listens for mouse
-     * clicks and for clicks on the buttons.  Create the board and
-     * start the first game.
-     */
     internal constructor() : JPanel(), ActionListener, MouseListener {
 
 
-        internal var board: CheckersData  // The data for the checkers board is kept here.
-        //    This board is also responsible for generating
-        //    lists of legal moves.
+        internal var board: CheckersData
 
-        internal var gameInProgress: Boolean = false // Is a game currently in progress?
+        internal var gameInProgress: Boolean = false
 
-        /* The next three variables are valid only when the game is in progress. */
 
-        internal var currentPlayer: Int = 0      // Whose turn is it now?  The possible values
-        //    are CheckersData.WHITE and CheckersData.BLACK.
+
+        internal var currentPlayer: Int = 0
 
         internal var selectedRow: Int = 0
-        internal var selectedCol: Int = 0  // If the current player has selected a piece to
-        //     move, these give the row and column
-        //     containing that piece.  If no piece is
-        //     yet selected, then selectedRow is -1.
+        internal var selectedCol: Int = 0
 
-        internal var legalMoves: Array<CheckersMove?>? = null  // An array containing the legal moves for the
+        internal var legalMoves: Array<CheckersMove?>? = null
 
         init {
             background = Color.BLACK
@@ -133,9 +85,6 @@ class Checkers : JPanel() {
         }
 
 
-        /**
-         * Respond to user's click on one of the two buttons.
-         */
         override fun actionPerformed(evt: ActionEvent) {
             val src = evt.source
             if (src === newGameButton)
@@ -166,9 +115,7 @@ class Checkers : JPanel() {
         }
 
 
-        /**
-         * Current player give up.  Game ends.  Opponent wins.
-         */
+
         internal fun doRestart() {
             if (!gameInProgress) {  // Should be impossible.
                 message!!.text = "There is no game in progress!"
@@ -181,12 +128,7 @@ class Checkers : JPanel() {
         }
 
 
-        /**
-         * The game ends.  The parameter, str, is displayed as a message
-         * to the user.  The states of the buttons are adjusted so players
-         * can start a new game.  This method is called when the game
-         * ends at any point in this class.
-         */
+
         internal fun gameOver(str: String) {
             message!!.text = str
             newGameButton!!.isEnabled = true
@@ -195,18 +137,8 @@ class Checkers : JPanel() {
         }
 
 
-        /**
-         * This is called by mousePressed() when a player clicks on the
-         * square in the specified row and col.  It has already been checked
-         * that a game is, in fact, in progress.
-         */
+
         internal fun doClickSquare(row: Int, col: Int) {
-
-            /* If the player clicked on one of the pieces that the player
-          can move, mark this row and col as selected and return.  (This
-          might change a previous selection.)  Reset the message, in
-          case it was previously displaying an error message. */
-
             for (i in legalMoves!!.indices)
                 if (legalMoves!![i]!!.fromRow == row && legalMoves!![i]!!.fromCol == col) {
                     selectedRow = row
@@ -247,11 +179,7 @@ class Checkers : JPanel() {
         }  // end doClickSquare()
 
 
-        /**
-         * This is called when the current player has chosen the specified
-         * move.  Make the move, and then either end or continue the game
-         * appropriately.
-         */
+
         internal fun doMakeMove(move: CheckersMove) {
 
             board.makeMove(move)
@@ -327,10 +255,6 @@ class Checkers : JPanel() {
         }  // end doMakeMove();
 
 
-        /**
-         * Draw  checkerboard pattern in black and blue.  Draw the
-         * checkers. If a game is in progress, highlight the legal moves.
-         */
         public override fun paintComponent(g: Graphics) {
 
             /* Draw a two-pixel black border around the edges of the canvas. */
@@ -402,11 +326,7 @@ class Checkers : JPanel() {
         }  /* end paintComponent() */
 
 
-        /**
-         * Respond to a user click on the board.  If no game is in progress, show
-         * an error message.  Otherwise, find the row and column that the user
-         * clicked and call doClickSquare() to handle it.
-         */
+
         override fun mousePressed(evt: MouseEvent) {
             if (!gameInProgress)
                 message!!.text = "Click \"New Game\" to start a new game."
@@ -427,18 +347,8 @@ class Checkers : JPanel() {
 
     }  // end class Board
 
-
-    /**
-     * An object of this class holds data about a game of checkers.
-     * It knows what kind of piece is on each square of the checkerboard.
-     * Note that WHITE moves "up" the board (i.e. row number decreases)
-     * while BLACK moves "down" the board (i.e. row number increases).
-     * Methods are provided to return lists of available legal moves.
-     */
     private class CheckersData
-    /**
-     * Constructor.  Create the board and set it up for a new game.
-     */
+
     internal constructor() {
 
 
@@ -448,15 +358,19 @@ class Checkers : JPanel() {
         init {
             setUpGame()
         }
+        companion object {
 
+            /*  The following constants represent the possible contents of a square
+          on the board.  The constants WHITE and BLACK also represent players
+          in the game. */
 
-        /**
-         * Set up the board with checkers in position for the beginning
-         * of a game.  Note that checkers can only be found in squares
-         * that satisfy  row % 2 == col % 2.  At the start of the game,
-         * all such squares in the first three rows contain black squares
-         * and all such squares in the last three rows contain white squares.
-         */
+            internal const val EMPTY = 0
+            internal const val WHITE = 1
+            internal const val WHITE_QUEEN = 2
+            internal const val BLACK = 3
+            internal const val BLACK_QUEEN = 4
+        }
+
         internal fun setUpGame() {
             for (row in 0..7) {
                 for (col in 0..7) {
@@ -474,30 +388,19 @@ class Checkers : JPanel() {
         }  // end setUpGame()
 
 
-        /**
-         * Return the contents of the square in the specified row and column.
-         */
+
         internal fun pieceAt(row: Int, col: Int): Int {
             return board[row][col]
         }
 
 
-        /**
-         * Make the specified move.  It is assumed that move
-         * is non-null and that the move it represents is legal.
-         */
+
         internal fun makeMove(move: CheckersMove) {
             makeMove(move.fromRow, move.fromCol, move.toRow, move.toCol)
         }
 
 
-        /**
-         * Make the move from (fromRow,fromCol) to (toRow,toCol).  It is
-         * assumed that this move is legal.  If the move is a jump, the
-         * jumped piece is removed from the board.  If a piece moves
-         * the last row on the opponent's side of the board, the
-         * piece becomes a queen.
-         */
+
         internal fun makeMove(fromRow: Int, fromCol: Int, toRow: Int, toCol: Int) {
             board[toRow][toCol] = board[fromRow][fromCol]
             board[fromRow][fromCol] = EMPTY
@@ -513,15 +416,7 @@ class Checkers : JPanel() {
                 board[toRow][toCol] = BLACK_QUEEN
         }
 
-        /**
-         * Return an array containing all the legal CheckersMoves
-         * for the specified player on the current board.  If the player
-         * has no legal moves, null is returned.  The value of player
-         * should be one of the constants WHITE or BLACK; if not, null
-         * is returned.  If the returned value is non-null, it consists
-         * entirely of jump moves or entirely of regular moves, since
-         * if the player can jump, only jumps are legal moves.
-         */
+
         internal fun getLegalMoves(player: Int): Array<CheckersMove?>? {
 
             if (player != WHITE && player != BLACK)
@@ -595,12 +490,7 @@ class Checkers : JPanel() {
         }  // end getLegalMoves
 
 
-        /**
-         * Return a list of the legal jumps that the specified player can
-         * make starting from the specified row and column.  If no such
-         * jumps are possible, null is returned.  The logic is similar
-         * to the logic of the getLegalMoves() method.
-         */
+
         internal fun getLegalJumpsFrom(player: Int, row: Int, col: Int): Array<CheckersMove?>? {
             if (player != WHITE && player != BLACK)
                 return null
@@ -630,13 +520,7 @@ class Checkers : JPanel() {
         }  // end getLegalMovesFrom()
 
 
-        /**
-         * This is called by the two previous methods to check whether the
-         * player can legally jump from (r1,c1) to (r3,c3).  It is assumed
-         * that the player has a piece at (r1,c1), that (r3,c3) is a position
-         * that is 2 rows and 2 columns distant from (r1,c1) and that
-         * (r2,c2) is the square between (r1,c1) and (r3,c3).
-         */
+
         private fun canJump(player: Int, r1: Int, c1: Int, r2: Int, c2: Int, r3: Int, c3: Int): Boolean {
             if (r3 < 0 || r3 >= 8 || c3 < 0 || c3 >= 8)
                 return false  // (r3,c3) is off the board.
@@ -656,12 +540,6 @@ class Checkers : JPanel() {
         }  // end canJump()
 
 
-        /**
-         * This is called by the getLegalMoves() method to determine whether
-         * the player can legally move from (r1,c1) to (r2,c2).  It is
-         * assumed that (r1,r2) contains one of the player's pieces and
-         * that (r2,c2) is a neighboring square.
-         */
         private fun canMove(player: Int, r1: Int, c1: Int, r2: Int, c2: Int): Boolean {
             if (r2 < 0 || r2 >= 8 || c2 < 0 || c2 >= 8)
                 return false  // (r2,c2) is off the board.
@@ -676,26 +554,11 @@ class Checkers : JPanel() {
             }
         }  // end canMove()
 
-        companion object {
 
-            /*  The following constants represent the possible contents of a square
-          on the board.  The constants WHITE and BLACK also represent players
-          in the game. */
-
-            internal const val EMPTY = 0
-            internal const val WHITE = 1
-            internal const val WHITE_QUEEN = 2
-            internal const val BLACK = 3
-            internal const val BLACK_QUEEN = 4
-        }
     } // end class CheckersData
 
     companion object {
-        /**
-         * Main routine makes it possible to run Checkers as a stand-alone
-         * application.  Opens a window showing a Checkers panel; the program
-         * ends when the user closes the window.
-         */
+
         @JvmStatic
         fun main(args: Array<String>) {
             val window = JFrame("Checkers")
