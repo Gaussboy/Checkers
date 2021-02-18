@@ -15,7 +15,6 @@ class Checkers : JPanel() {
     private var restartButton: JButton? = null
     private var message: JLabel? = null
 
-
     init {
         layout = null
         preferredSize = Dimension(390, 290)
@@ -287,16 +286,13 @@ class Checkers : JPanel() {
             }
         }
 
-
         fun pieceAt(row: Int, col: Int): Int {
             return board[row][col]
         }
 
-
         fun makeMove(move: CheckersMove) {
             makeMove(move.fromRow, move.fromCol, move.toRow, move.toCol)
         }
-
 
         fun makeMove(fromRow: Int, fromCol: Int, toRow: Int, toCol: Int) {
             board[toRow][toCol] = board[fromRow][fromCol]
